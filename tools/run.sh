@@ -96,20 +96,51 @@ PY
   COLLECTION_NAME="${metadata_lines[1]}"
 }
 
-ensure_collection_layout() {
+prepare_collection_workspace() {
   load_collection_metadata
   local layout_root="$PROJECT_ROOT/.ansible_collections"
   local target="$layout_root/ansible_collections/$COLLECTION_NAMESPACE/$COLLECTION_NAME"
-  mkdir -p "$(dirname "$target")"
-  if [[ ! -e "$target" ]]; then
-    ln -sfn "$PROJECT_ROOT" "$target"
-  fi
+
+  python - "$PROJECT_ROOT" "$target" <<'PY'
+import pathlib
+import shutil
+import sys
+
+source = pathlib.Path(sys.argv[1]).resolve()
+destination = pathlib.Path(sys.argv[2]).resolve()
+
+ignore_names = {
+    '.git',
+    '.ansible_collections',
+    '__pycache__',
+    '.pytest_cache',
+    '.mypy_cache',
+    '.tox',
+    '.venv',
+    'dist',
+    'build',
+    '*.egg-info',
+}
+
+if destination.exists():
+    shutil.rmtree(destination)
+
+destination.parent.mkdir(parents=True, exist_ok=True)
+
+shutil.copytree(
+    source,
+    destination,
+    symlinks=True,
+    ignore=shutil.ignore_patterns(*ignore_names, '*.pyc', '*.pyo'),
+)
+PY
+
   COLLECTION_PATH="$target"
 }
 
 run_in_collection() {
-  ensure_collection_layout
-  (cd "$COLLECTION_PATH" && "$@")
+  prepare_collection_workspace
+  (cd "$COLLECTION_PATH" && PWD="$COLLECTION_PATH" "$@")
 }
 
 run_deps() {
