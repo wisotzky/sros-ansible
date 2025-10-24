@@ -183,6 +183,34 @@ export SROS_PASSWORD=admin
 ./tools/run.sh integration --targets device_info
 ```
 
+#### Authenticating to private registries and licensing the container
+
+The Nokia SR OS container hosted on GitHub Container Registry (GHCR) requires credentials and a valid license file.
+
+1. Generate a [personal access token](https://github.com/settings/tokens/new) from your GitHub account with the `read:packages` scope.
+2. Log in locally using Docker (replace `<username>` with your GitHub handle):
+   ```bash
+   echo '<token>' | docker login ghcr.io -u <username> --password-stdin
+   ```
+   Alternatively, export the following variables before running `tools/run.sh integration` so the helper can authenticate on your behalf:
+   ```bash
+   export SROS_REGISTRY=ghcr.io
+   export SROS_REGISTRY_USERNAME=<username>
+   export SROS_REGISTRY_PASSWORD='<token>'
+   ```
+3. Obtain a SR OS container license file from Nokia support and set `SROS_LICENSE_FILE` to its absolute path.
+
+For GitHub Actions, store the same information as repository secrets so CI can authenticate and mount the license:
+
+| Secret name | Purpose |
+|-------------|---------|
+| `SROS_REGISTRY` | Registry host, for example `ghcr.io`. |
+| `SROS_REGISTRY_USERNAME` | Username used to authenticate to the registry. |
+| `SROS_REGISTRY_PASSWORD` | Personal access token with `read:packages`. |
+| `SROS_CONTAINER_LICENSE_B64` | Base64-encoded license contents: `base64 -w0 /path/to/sros.lic`. |
+| `SROS_USERNAME` *(optional)* | Device username injected into the integration tests (defaults to `admin`). |
+| `SROS_PASSWORD` *(optional)* | Device password injected into the integration tests (defaults to `admin`). |
+
 The script downloads the image (performing `docker login` if already configured), exposes SSH on `localhost:2222` and NETCONF on `localhost:2830`, waits for the control plane to boot, and executes `ansible-test integration` against the inventory in `tests/integration`.
 Set `SROS_CONTAINER_EXTRA_ARGS="--privileged"` if your SR OS image requires elevated container permissions.
 

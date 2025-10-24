@@ -15,6 +15,9 @@ SROS_USERNAME="${SROS_USERNAME:-}"
 SROS_PASSWORD="${SROS_PASSWORD:-}"
 SROS_NETWORK_OS="${SROS_NETWORK_OS:-}"
 SROS_CONTAINER_EXTRA_ARGS="${SROS_CONTAINER_EXTRA_ARGS:-}"
+SROS_REGISTRY="${SROS_REGISTRY:-}"
+SROS_REGISTRY_USERNAME="${SROS_REGISTRY_USERNAME:-}"
+SROS_REGISTRY_PASSWORD="${SROS_REGISTRY_PASSWORD:-}"
 
 usage() {
   cat <<USAGE
@@ -41,6 +44,9 @@ Environment variables:
   SROS_BOOT_TIMEOUT        Seconds to wait for the SR OS container to become reachable (default: 180).
   SROS_CONTAINER_EXTRA_ARGS
                            Additional docker arguments appended when starting the container.
+  SROS_REGISTRY            Registry hostname used for docker login (for example ghcr.io).
+  SROS_REGISTRY_USERNAME   Username passed to docker login when SROS_REGISTRY is set.
+  SROS_REGISTRY_PASSWORD   Password or token passed to docker login when SROS_REGISTRY is set.
 USAGE
 }
 
@@ -200,6 +206,11 @@ start_container() {
   command_exists docker || fail "docker is required for integration tests"
 
   cleanup_container
+
+  if [[ -n "$SROS_REGISTRY" && -n "$SROS_REGISTRY_USERNAME" && -n "$SROS_REGISTRY_PASSWORD" ]]; then
+    info "Logging in to ${SROS_REGISTRY} as ${SROS_REGISTRY_USERNAME}"
+    echo "$SROS_REGISTRY_PASSWORD" | docker login "$SROS_REGISTRY" --username "$SROS_REGISTRY_USERNAME" --password-stdin >/dev/null
+  fi
 
   info "Pulling SR OS container image ${SROS_IMAGE}"
   docker pull "$SROS_IMAGE"

@@ -34,6 +34,21 @@ Thank you for your interest in improving the `nokia.sros` Ansible collection! Th
    ./tools/run.sh build
    ```
 
+### Repository secrets for CI
+
+CI integration tests require credentials for the private SR OS container registry and a base64-encoded license file. Configure the following repository secrets in GitHub before enabling the workflow:
+
+| Secret name | Purpose |
+|-------------|---------|
+| `SROS_REGISTRY` | Registry host, for example `ghcr.io`. |
+| `SROS_REGISTRY_USERNAME` | Account used to authenticate to the registry (typically your GitHub username). |
+| `SROS_REGISTRY_PASSWORD` | Personal access token with `read:packages` scope. |
+| `SROS_CONTAINER_LICENSE_B64` | Base64-encoded license contents produced with `base64 -w0 /path/to/sros.lic`. |
+| `SROS_USERNAME` *(optional)* | Overrides the device username used in integration tests (defaults to `admin`). |
+| `SROS_PASSWORD` *(optional)* | Overrides the device password used in integration tests (defaults to `admin`). |
+
+When running tests locally you can reuse the same credentials via environment variables (`SROS_REGISTRY`, `SROS_REGISTRY_USERNAME`, `SROS_REGISTRY_PASSWORD`, `SROS_LICENSE_FILE`) or log in with `docker login` ahead of time.
+
 ## Coding standards
 
 * Follow the module and plugin layout used in the [Ansible community collections](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html).
