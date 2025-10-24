@@ -57,6 +57,61 @@ info() {
   echo "[INFO] $*" >&2
 }
 
+load_collection_metadata() {
+  if [[ -n "${COLLECTION_NAMESPACE:-}" && -n "${COLLECTION_NAME:-}" ]]; then
+    return
+  fi
+
+  local metadata
+  metadata="$(python - "$PROJECT_ROOT/galaxy.yml" <<'PY'
+import pathlib
+import sys
+
+def clean(value: str) -> str:
+    value = value.strip()
+    if value and value[0] in {'"', '\''} and value[-1] == value[0]:
+        value = value[1:-1]
+    return value
+
+galaxy = pathlib.Path(sys.argv[1])
+namespace = None
+name = None
+for line in galaxy.read_text().splitlines():
+    stripped = line.strip()
+    if not stripped or stripped.startswith('#'):
+        continue
+    if stripped.startswith('namespace:') and namespace is None:
+        namespace = clean(stripped.split(':', 1)[1])
+    elif stripped.startswith('name:') and name is None:
+        name = clean(stripped.split(':', 1)[1])
+if not namespace or not name:
+    raise SystemExit('namespace and name must be defined in galaxy.yml')
+print(namespace)
+print(name)
+PY
+)"
+
+  readarray -t metadata_lines <<<"$metadata"
+  COLLECTION_NAMESPACE="${metadata_lines[0]}"
+  COLLECTION_NAME="${metadata_lines[1]}"
+}
+
+ensure_collection_layout() {
+  load_collection_metadata
+  local layout_root="$PROJECT_ROOT/.ansible_collections"
+  local target="$layout_root/ansible_collections/$COLLECTION_NAMESPACE/$COLLECTION_NAME"
+  mkdir -p "$(dirname "$target")"
+  if [[ ! -e "$target" ]]; then
+    ln -sfn "$PROJECT_ROOT" "$target"
+  fi
+  COLLECTION_PATH="$target"
+}
+
+run_in_collection() {
+  ensure_collection_layout
+  (cd "$COLLECTION_PATH" && "$@")
+}
+
 run_deps() {
   info "Installing Python dependencies"
   python -m pip install --upgrade pip
@@ -69,7 +124,7 @@ run_sanity() {
     args=("--python" "$PYTHON_VERSION")
   fi
   info "Running ansible-test sanity ${args[*]}"
-  ansible-test sanity "${args[@]}"
+  run_in_collection ansible-test sanity "${args[@]}"
 }
 
 run_build() {
@@ -169,7 +224,7 @@ run_integration() {
   fi
 
   info "Running ansible-test integration ${args[*]}"
-  ansible-test integration "${args[@]}"
+  run_in_collection ansible-test integration "${args[@]}"
 }
 
 run_all() {

@@ -2,4 +2,5 @@ dist/
 .venv/
 __pycache__/
 *.tar.gz
+.ansible_collections/
 .licenses/
