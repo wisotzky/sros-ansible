@@ -1,9 +1,17 @@
-![NOKIA](https://raw.githubusercontent.com/wisotzky/sros-ansible/master/media/logo.png)
+![NOKIA](media/logo.png)
 # Ansible Collection - nokia.sros
 
 ***
 
 This [collection](https://galaxy.ansible.com/nokia/sros) provides automation for Nokia SR OS devices using Ansible by Red Hat.
+It ships the same device plugins that power the official [nokia.srlinux collection](https://github.com/nokia/srlinux-ansible-collection)
+and follows the same testing and release processes.
+
+## Project resources
+
+* [Changelog](CHANGELOG.md)
+* [Contribution guide](CONTRIBUTING.md)
+* [GitHub Actions workflows](.github/workflows)
 
 ## Installation
 Distribution is via [ansible-galaxy](https://galaxy.ansible.com/).
@@ -24,7 +32,7 @@ To install this collection, please use the following command:
 ansible-galaxy collection install nokia.sros
 ```
 
-If you have already installed a previous version, you can  upgrade to the latest version of this collection, by adding the `--force-with-deps` option:
+If you have already installed a previous version, you can upgrade to the latest version of this collection by adding the `--force-with-deps` option:
 ```bash
 ansible-galaxy collection install nokia.sros --force-with-deps
 ```
@@ -36,6 +44,7 @@ To use this collection make sure to set `ansible_network_os=nokia.sros.{mode}` i
 * ansible-core 2.13 or newer
 * Python 3.8 or newer on the Ansible control node
 * Python libraries: [ansible-pylibssh](https://pypi.org/project/ansible-pylibssh/), [jxmlease](https://pypi.org/project/jxmlease/), [ncclient](https://pypi.org/project/ncclient/)
+* Docker Engine 20.10 or newer (for the containerised test harness)
 
 ## Supported Nokia SR OS versions
 Tested with SR OS 19.5, 19.7, 19.10 and 20.5
@@ -147,3 +156,44 @@ If a change causes asterisk to appear before prompt, then the task is considered
 RESTRICTIONS:
 * If there were unsaved changes on a device before running cli_conifg task it will be assumed as changed.
 * This plugin does support neither `--diff` mode nor `--check` mode.
+
+## Development
+
+### Running the automated checks locally
+
+The `tools/run.sh` helper mirrors the CI workflow and keeps prerequisites in one place:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+./tools/run.sh deps
+./tools/run.sh sanity
+./tools/run.sh build
+```
+
+### Integration testing with containerised SR OS releases
+
+Integration tests rely on licensed SR OS container images. Provide the credentials and image that match your lab, then invoke the helper script:
+
+```bash
+export SROS_CONTAINER_IMAGE=ghcr.io/nokia/sros-container:23.7.R1
+export SROS_LICENSE_FILE=$HOME/.licenses/sros.lic
+export SROS_USERNAME=admin
+export SROS_PASSWORD=admin
+./tools/run.sh integration --targets device_info
+```
+
+The script downloads the image (performing `docker login` if already configured), exposes SSH on `localhost:2222` and NETCONF on `localhost:2830`, waits for the control plane to boot, and executes `ansible-test integration` against the inventory in `tests/integration`.
+Set `SROS_CONTAINER_EXTRA_ARGS="--privileged"` if your SR OS image requires elevated container permissions.
+
+### Releasing
+
+Tagged releases on GitHub automatically build the collection artifact and publish it to Ansible Galaxy by using the
+`ANSIBLE_GALAXY_API_KEY` secret. To perform a dry run locally you can execute:
+
+```bash
+./tools/run.sh build
+ansible-galaxy collection publish dist/nokia-sros-*.tar.gz --api-key <token>
+```
+
+Refer to the [CONTRIBUTING](CONTRIBUTING.md) guide for full details on coding conventions, testing expectations, and the release checklist.
