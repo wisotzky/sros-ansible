@@ -4,22 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0]
 ### Added
-- Container-driven integration test harness and GitHub workflow alignment with the `nokia.srlinux` collection.
-- `tools/run.sh` helper that provisions a SR OS container and runs ansible-test locally.
-- Contribution guidelines and a changelog to make community collaboration easier.
+- Containerlab topology as test-automation reference
+- GitHub workflow to build collection for every new release
 
 ### Changed
-- Updated sample inventories and documentation to focus on containerised lab environments.
+- Single repo for `nokia.sros` collection for simplified release management
 
 ### Fixed
-- Removed stale IP addresses from example inventories to avoid accidental production access.
+- Updated playbooks for compatibility with latest Ansible releases
 
-## [1.8.0]
-### Added
-- Initial alignment with the Nokia SR OS network automation content published on Ansible Galaxy.
-- Example playbooks for classic CLI, MD-CLI, and NETCONF automation workflows.
-
-[Unreleased]: https://github.com/nokia/sros-ansible/compare/v1.8.0...HEAD
-[1.8.0]: https://github.com/nokia/sros-ansible/releases/tag/v1.8.0
+[2.0.0]: https://github.com/nokia/sros-ansible/releases/tag/v2.0.0

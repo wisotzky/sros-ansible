@@ -1,7 +1,11 @@
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
 ---
-- hosts: nokia
+- hosts: nokia_classic
   vars:
-    ansible_network_os: nokia.sros.md
+    ansible_network_os: nokia.sros.classic
   vars_prompt:
     - name: ansible_user
       prompt: "Username"
@@ -30,17 +34,13 @@
     cli_config:
       config: |
         configure service
-          customer nobody
-            customer-id 100
+          customer 100 name nobody create
             back
-          vpls midnight
-            service-id 100
-            customer nobody
-          exit all
+          vpls 100 name midnight customer 100 create
+            exit all
 
-  - name: "restore backup (Success: MDCLI does support restore)"
+  - name: "restore backup (Error: Classic-CLI does not support restore)"
     cli_config:
       replace: 'true'
       config: "{{ lookup('file', backup_info.backup_path) }}"
-
 ...

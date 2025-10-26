@@ -1,3 +1,7 @@
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
 ---
 - hosts: nokia
   vars:
@@ -14,7 +18,8 @@
   tasks:
   - name: add services
     cli_config:
-      config: "{{ lookup('template', 'addVplsBulk.cli.j2') }}"
+      config: "{{ lookup('ansible.builtin.template', '{{ playbook_dir }}/templates/addVplsBulk.cli.j2') }}"
+
 
   - name: admin save
     cli_command:
@@ -24,7 +29,7 @@
 
   - name: delete services
     cli_config:
-      config: "{{ lookup('template', 'delVplsBulk.cli.j2') }}"
+      config: "{{ lookup('ansible.builtin.template', '{{ playbook_dir }}/templates/delVplsBulk.cli.j2') }}"
 
   - name: admin save
     cli_command:

@@ -1,7 +1,11 @@
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
 ---
-- hosts: nokia_classic
+- hosts: nokia
   vars:
-    ansible_network_os: nokia.sros.classic
+    ansible_network_os: nokia.sros.md
   vars_prompt:
     - name: ansible_user
       prompt: "Username"
@@ -19,9 +23,13 @@
     cli_config:
       config: |
         configure system
-        contact nobody
-        location berlin
-        exit all
+          contact nobody
+          location hamburg
+          exit all
+
+  - name: do rollback
+    cli_config:
+      rollback: 1
 
   - name: backup
     cli_config:

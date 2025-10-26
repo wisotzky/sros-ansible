@@ -1,12 +1,43 @@
-# Contributing
+# SR OS Ansible Collection Developer Guide
 
-Thank you for your interest in improving the `nokia.sros` Ansible collection! This guide captures the key expectations for code changes, documentation updates, and release management.
+Thank you for your interest in improving the `nokia.sros` Ansible collection! This guide captures the initial steps and key expectations for code changes, documentation updates, and release management.
 
 ## Prerequisites
 
-* Python 3.8 or newer and `pip`
-* Docker Engine 20.10+ for running the SR OS container images
-* Access to licensed SR OS container images (for example from Nokia's GHCR registry)
+* Python 3.9 or newer and `pip`
+* Docker for running the SR OS container images
+* Access to SR OS container images and licenses
+
+## Quick Start
+
+Start with cloning the repo:
+
+```bash
+git clone git@github.com:nokia/srlinux-ansible-collection.git
+cd srlinux-ansible-collection
+```
+
+Deploy the lab to support the tests:
+
+```bash
+./run.sh deploy-lab
+```
+
+Run the automated suite of tests to make sure nothing is missing. This will also prepare a dev environment (you have to make sure the venv with ansible is activated or ansible-playbook is in your path):
+
+```bash
+./run.sh test
+```
+
+To validate that the code passes Ansible's sanity check, run:
+
+```bash
+./run.sh sanity-test
+```
+
+
+
+
 
 ## Local development workflow
 
@@ -69,6 +100,75 @@ When running tests locally you can reuse the same credentials via environment va
 2. Add a new entry to `CHANGELOG.md` describing the changes.
 3. Tag the release (for example `git tag v1.9.0`) and push the tag to GitHub.
 4. Creating a GitHub release automatically triggers the workflow that builds the collection and publishes it to Ansible Galaxy. Ensure the `ANSIBLE_GALAXY_API_KEY` secret is present in the repository settings.
+
+## Development
+
+### Running the automated checks locally
+
+The `tools/run.sh` helper mirrors the CI workflow and keeps prerequisites in one place:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+./tools/run.sh deps
+./tools/run.sh sanity
+./tools/run.sh build
+```
+
+### Integration testing with containerised SR OS releases
+
+Integration tests rely on licensed SR OS container images. Provide the credentials and image that match your lab, then invoke the helper script:
+
+```bash
+export SROS_CONTAINER_IMAGE=ghcr.io/nokia/sros-container:23.7.R1
+export SROS_LICENSE_FILE=$HOME/.licenses/sros.lic
+export SROS_USERNAME=admin
+export SROS_PASSWORD=admin
+./tools/run.sh integration --targets device_info
+```
+
+#### Authenticating to private registries and licensing the container
+
+The Nokia SR OS container hosted on GitHub Container Registry (GHCR) requires credentials and a valid license file.
+
+1. Generate a [personal access token](https://github.com/settings/tokens/new) from your GitHub account with the `read:packages` scope.
+2. Log in locally using Docker (replace `<username>` with your GitHub handle):
+   ```bash
+   echo '<token>' | docker login ghcr.io -u <username> --password-stdin
+   ```
+   Alternatively, export the following variables before running `tools/run.sh integration` so the helper can authenticate on your behalf:
+   ```bash
+   export SROS_REGISTRY=ghcr.io
+   export SROS_REGISTRY_USERNAME=<username>
+   export SROS_REGISTRY_PASSWORD='<token>'
+   ```
+3. Obtain a SR OS container license file from Nokia support and set `SROS_LICENSE_FILE` to its absolute path.
+
+For GitHub Actions, store the same information as repository secrets so CI can authenticate and mount the license:
+
+| Secret name | Purpose |
+|-------------|---------|
+| `SROS_REGISTRY` | Registry host, for example `ghcr.io`. |
+| `SROS_REGISTRY_USERNAME` | Username used to authenticate to the registry. |
+| `SROS_REGISTRY_PASSWORD` | Personal access token with `read:packages`. |
+| `SROS_CONTAINER_LICENSE_B64` | Base64-encoded license contents: `base64 -w0 /path/to/sros.lic`. |
+| `SROS_USERNAME` *(optional)* | Device username injected into the integration tests (defaults to `admin`). |
+| `SROS_PASSWORD` *(optional)* | Device password injected into the integration tests (defaults to `admin`). |
+
+The script downloads the image (performing `docker login` if already configured), exposes SSH on `localhost:2222` and NETCONF on `localhost:2830`, waits for the control plane to boot, and executes `ansible-test integration` against the inventory in `tests/integration`.
+Set `SROS_CONTAINER_EXTRA_ARGS="--privileged"` if your SR OS image requires elevated container permissions.
+
+### Releasing
+
+Tagged releases on GitHub automatically build the collection artifact and publish it to Ansible Galaxy by using the
+`ANSIBLE_GALAXY_API_KEY` secret. To perform a dry run locally you can execute:
+
+```bash
+./tools/run.sh build
+ansible-galaxy collection publish dist/nokia-sros-*.tar.gz --api-key <token>
+```
+
+Refer to the [CONTRIBUTING](CONTRIBUTING.md) guide for full details on coding conventions, testing expectations, and the release checklist.
 
 ## Need help?
 
