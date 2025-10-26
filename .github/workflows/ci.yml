@@ -65,18 +65,17 @@ jobs:
 
       - name: Start containerlab topology
         run: |
-          sudo containerlab deploy --topo ./tests/topo-ci.clab.yml
+          sudo containerlab deploy --topo ./tests/topo.clab.yml
       
       - name: Run Ansible Playbooks
         run: |
-          pwd
+          cd tests
           ls -la
-          ls -la tests
-          ls -la tests/clab-ansible
-          cat tests/clab-ansible/ansible-inventory.yml
-          ansible-playbook -i tests/hosts tests/playbooks/sros_nc_device_info.yml
+          ls -la clab-ansible
+          cat clab-ansible/ansible-inventory.yml
+          ansible-playbook playbooks/sros_nc_device_info.yml
 
       - name: Destroy containerlab topology
         if: always()
         run: |
-          sudo containerlab destroy --topo ./tests/topo-ci.clab.yml  
+          sudo containerlab destroy --topo ./tests/topo.clab.yml  
