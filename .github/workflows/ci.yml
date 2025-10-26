@@ -73,6 +73,7 @@ jobs:
           ls -la
           ls -la tests
           ls -la tests/clab-ansible
+          cat tests/clab-ansible/ansible-inventory.yml
           ansible-playbook -i tests/hosts tests/playbooks/sros_nc_device_info.yml
 
       - name: Destroy containerlab topology
