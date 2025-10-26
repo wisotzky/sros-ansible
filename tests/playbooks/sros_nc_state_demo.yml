@@ -5,11 +5,11 @@
 ---
 - hosts: all
   gather_facts: No
-  vars:
-    ansible_connection: netconf
 
   tasks:
   - name: get state
+    vars:
+      ansible_connection: netconf     
     ansible.netcommon.netconf_get:
       filter: <state xmlns="urn:nokia.com:sros:ns:yang:sr:state"><system/></state>
       display: json

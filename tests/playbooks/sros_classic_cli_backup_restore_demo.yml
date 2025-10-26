@@ -5,6 +5,7 @@
 ---
 - hosts: clab-ansible-classic
   gather_facts: No
+#  when: ansible_network_os == "nokia.sros.md"
   vars:
     ansible_network_os: nokia.sros.classic
     ansible_connection: network_cli
