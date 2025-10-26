@@ -55,8 +55,9 @@ jobs:
 
       - name: Pull Nokia SRSIM image
         run: |
-          docker pull ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1
-          docker tag ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1 registry.srlinux.dev/pub/nokia_srsim:25.7.R1
+          docker pull ghcr.io/nokia/srlinux:latest
+#          docker pull ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1
+#          docker tag ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1 registry.srlinux.dev/pub/nokia_srsim:25.7.R1
 
       - name: Create license file
         run: |
@@ -65,7 +66,7 @@ jobs:
 
       - name: Start containerlab topology
         run: |
-          sudo containerlab deploy --topo ./tests/topo.clab.yml
+          sudo containerlab deploy --topo ./tests/topo.clab-ci.yml
       
       - name: Run Ansible Playbooks
         run: |
@@ -74,4 +75,4 @@ jobs:
       - name: Destroy containerlab topology
         if: always()
         run: |
-          sudo containerlab destroy --topo ./tests/topo.clab.yml  
+          sudo containerlab destroy --topo ./tests/topo.clab-ci.yml  

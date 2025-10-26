@@ -1,0 +1,18 @@
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
+name: ansible
+
+topology:
+  kinds:
+    nokia_srlinux:
+      image: ghcr.io/nokia/srlinux
+
+  nodes:
+    md:
+      kind: nokia_srlinux
+      mgmt-ipv4: 172.20.20.222
+
+  links:
+    - endpoints: ["md:e1-1", "md:e1-2"]
