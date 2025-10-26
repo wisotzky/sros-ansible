@@ -3,15 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 ---
-- hosts: nokia
-  vars:
-    ansible_network_os: nokia.sros.md
-  vars_prompt:
-    - name: ansible_user
-      prompt: "Username"
-      private: no
-    - name: ansible_password
-      prompt: "Password"
+- hosts: all
   connection: netconf
   gather_facts: No
 

@@ -68,12 +68,9 @@ jobs:
       
       - name: Run Ansible Playbooks
         run: |
-          cd tests
-          ls -la
-          ls -la clab-ansible
-          cat clab-ansible/ansible-inventory.yml
           ansible-playbook playbooks/sros_nc_device_info.yml
-
+          ansible-playbook playbooks/sros_nc_state_demo.yml
+          
       - name: Destroy containerlab topology
         if: always()
         run: |
