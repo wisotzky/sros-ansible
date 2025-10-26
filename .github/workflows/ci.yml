@@ -71,7 +71,8 @@ jobs:
         run: |
           pwd
           ls -la
-          ls -la tests/
+          ls -la tests
+          ls -la tests/clab-ansible
           ansible-playbook -i tests/hosts tests/playbooks/sros_nc_device_info.yml
 
       - name: Destroy containerlab topology
