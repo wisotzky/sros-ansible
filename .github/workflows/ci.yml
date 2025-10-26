@@ -36,6 +36,7 @@ jobs:
       - name: Install Ansible collections
         run: |
           ansible-galaxy collection install ansible.netcommon ansible.utils community.general
+          ansible-galaxy collection install nokia.srlinux
 
       - name: Build and install this collection
         run: |
