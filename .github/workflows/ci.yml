@@ -2,7 +2,6 @@
 name: CICD
 
 on:
-  push:
   pull_request:
   workflow_dispatch:
 
@@ -61,18 +60,21 @@ jobs:
 
       - name: Create license file
         run: |
-          sudo mkdir -p /opt/nokia/sros
-          echo $SRSIM_LICENSE > /opt/nokia/sros/license.txt
+          echo $SRSIM_LICENSE > license.txt
+          cat license.txt
 
       - name: Start containerlab topology
         run: |
-          sudo containerlab deploy --topo ./tests/topo.clab-ci.yml
+          sudo containerlab deploy --topo ./tests/topo-ci.clab.yml
       
       - name: Run Ansible Playbooks
         run: |
+          pwd
+          ls -la
+          ls -la tests/
           ansible-playbook -i tests/hosts tests/playbooks/sros_nc_device_info.yml
 
       - name: Destroy containerlab topology
         if: always()
         run: |
-          sudo containerlab destroy --topo ./tests/topo.clab-ci.yml  
+          sudo containerlab destroy --topo ./tests/topo-ci.clab.yml  
