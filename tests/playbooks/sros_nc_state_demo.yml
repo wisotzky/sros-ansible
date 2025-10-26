@@ -4,11 +4,9 @@
 
 ---
 - hosts: all
-  connection: netconf
   gather_facts: No
-
-  collections:
-  - nokia.sros
+  vars:
+    ansible_connection: netconf
 
   tasks:
   - name: get state

@@ -3,24 +3,15 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 ---
-- hosts: nokia_classic
+- hosts: clab-ansible-classic
+  gather_facts: No
   vars:
     ansible_network_os: nokia.sros.classic
-  vars_prompt:
-    - name: ansible_user
-      prompt: "Username"
-      private: no
-    - name: ansible_password
-      prompt: "Password"
-  connection: network_cli
-  gather_facts: No
-
-  collections:
-  - nokia.sros
+    ansible_connection: network_cli
 
   tasks:
   - name: backup
-    cli_config:
+    nokia.sros.cli_config:
       backup: yes
       backup_options:
         dir_path: /tmp
@@ -31,7 +22,7 @@
       msg: "{{backup_info}}"
 
   - name: do some config
-    cli_config:
+     nokia.sros.cli_config:
       config: |
         configure service
           customer 100 name nobody create
