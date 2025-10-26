@@ -30,7 +30,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libssh-dev
-          
+
       - name: Install requirements
         run: pip install -r requirements.txt
 
@@ -41,8 +41,7 @@ jobs:
 
       - name: Build and install this collection
         run: |
-          ansible-galaxy collection build .
-          ansible-galaxy collection install dist/nokia-sros-*.tar.gz  
+          ansible-galaxy collection install .
 
       - name: Install containerlab
         run: bash -c "$(curl -sL https://get.containerlab.dev)"
