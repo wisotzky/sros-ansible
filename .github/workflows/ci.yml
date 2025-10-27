@@ -54,15 +54,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull Nokia SRSIM image
-        run: |
-          docker pull ghcr.io/nokia/srlinux:latest
-#          docker pull ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1
-#          docker tag ghcr.io/srl-labs/containerlab/nokia_srsim:25.7.R1 registry.srlinux.dev/pub/nokia_srsim:25.7.R1
+#      - name: Pull Nokia SRSIM image
+#        run: |
+#          docker pull ghcr.io/nokia/srlinux:latest
+#          docker pull ghcr.io/nokia/nokia_srsim:25.7.R2
 
       - name: Create license file
         run: |
-          echo $SRSIM_LICENSE > license.txt
+          echo $SRSIM_LICENSE > tests/license.txt
 
       - name: Start containerlab topology
         run: |
