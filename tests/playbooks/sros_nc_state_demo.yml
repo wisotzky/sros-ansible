@@ -5,6 +5,7 @@
 ---
 - hosts: all
   gather_facts: No
+  when: ansible_network_os == "nokia.sros.md"
 
   tasks:
   - name: get state
