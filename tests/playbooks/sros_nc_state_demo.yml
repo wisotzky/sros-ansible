@@ -5,16 +5,25 @@
 ---
 - hosts: all
   gather_facts: No
-  when: ansible_network_os == "nokia.sros.md"
 
   tasks:
-  - name: get state
+  - name: get state SR OS
     vars:
       ansible_connection: netconf     
     ansible.netcommon.netconf_get:
       filter: <state xmlns="urn:nokia.com:sros:ns:yang:sr:state"><system/></state>
       display: json
     register: result
+    when: ansible_network_os == "nokia.sros.md"
+
+  - name: get state SRLinux
+    vars:
+      ansible_connection: netconf     
+    ansible.netcommon.netconf_get:
+      filter: <system xmlns="urn:nokia.com:srlinux:ns:yang:srlinux-system"><version/></system>
+      display: json
+    register: result
+    when: ansible_network_os == "nokia.slinux.srlinux"
 
   - name: save result
     set_fact:
