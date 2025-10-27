@@ -31,5 +31,6 @@
 
   - name: display results
     debug:
-      var: my_var.output.data.state.system.version
+#      var: my_var.output.data.state.system.version
+      var: my_var
 ...
