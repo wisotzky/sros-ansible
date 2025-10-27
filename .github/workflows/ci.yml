@@ -36,7 +36,6 @@ jobs:
       - name: Install Ansible collections
         run: |
           ansible-galaxy collection install ansible.netcommon ansible.utils community.general
-          ansible-galaxy collection install nokia.srlinux
 
       - name: Build and install this collection
         run: |
@@ -65,7 +64,11 @@ jobs:
       - name: Start containerlab topology
         run: |
           sudo containerlab deploy --topo ./tests/topo.clab.yml
-      
+
+      - name: Display ansible inventory
+        run: |
+          cat clab-ansible/ansible-inventory.yml
+
       - name: Run Ansible Playbooks
         run: |
           cd tests

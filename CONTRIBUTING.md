@@ -13,8 +13,8 @@ Thank you for your interest in improving the `nokia.sros` Ansible collection! Th
 Start with cloning the repo:
 
 ```bash
-git clone git@github.com:nokia/srlinux-ansible-collection.git
-cd srlinux-ansible-collection
+git clone git@github.com:nokia/sros-ansible.git
+cd sros-ansible
 ```
 
 Deploy the lab to support the tests:

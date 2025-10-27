@@ -10,7 +10,7 @@ Distribution is via [ansible-galaxy](https://galaxy.ansible.com/).
 
 Please remind, that this project is a Nokia initiated Open-Source initiative under [BSD 3-clause license](./license) to support the adoption of programmable network automation using standard IT tools. We welcome users to become part of our network DevOps community, by helping to provide tutorials, reallife playbook examples, raising issues or feature requests or help with code contributions.
 
-> **NOTES** s
+> **NOTES**
 >
 > For SRLinux devices including Nokia's data center switches, use our [`nokia.srlinux` collection](https://galaxy.ansible.com/nokia/srlinux).
 >

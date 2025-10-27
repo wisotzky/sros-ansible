@@ -14,16 +14,6 @@
       filter: <state xmlns="urn:nokia.com:sros:ns:yang:sr:state"><system/></state>
       display: json
     register: result
-    when: ansible_network_os == "nokia.sros.md"
-
-  - name: get state SRLinux
-    vars:
-      ansible_connection: netconf     
-    ansible.netcommon.netconf_get:
-      filter: <system xmlns="urn:nokia.com:srlinux:ns:yang:srlinux-system"><version/></system>
-      display: json
-    register: result
-    when: ansible_network_os == "nokia.slinux.srlinux"
 
   - name: save result
     set_fact:
@@ -31,6 +21,5 @@
 
   - name: display results
     debug:
-#      var: my_var.output.data.state.system.version
-      var: my_var
+      var: my_var.output.data.state.system.version
 ...
