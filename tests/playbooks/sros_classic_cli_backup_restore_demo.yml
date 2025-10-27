@@ -5,14 +5,12 @@
 ---
 - hosts: clab-ansible-classic
   gather_facts: No
-#  when: ansible_network_os == "nokia.sros.md"
   vars:
     ansible_network_os: nokia.sros.classic
-    ansible_connection: network_cli
 
   tasks:
   - name: backup
-    nokia.sros.cli_config:
+    ansible.netcommon.cli_config:
       backup: yes
       backup_options:
         dir_path: /tmp
@@ -23,7 +21,7 @@
       msg: "{{backup_info}}"
 
   - name: do some config
-     nokia.sros.cli_config:
+    ansible.netcommon.cli_config:
       config: |
         configure service
           customer 100 name nobody create
@@ -32,7 +30,7 @@
             exit all
 
   - name: "restore backup (Error: Classic-CLI does not support restore)"
-    cli_config:
+    ansible.netcommon.cli_config:
       replace: 'true'
       config: "{{ lookup('file', backup_info.backup_path) }}"
 ...

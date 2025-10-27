@@ -40,8 +40,6 @@ topology:
 
         /configure system contact "nokia"
         /configure system security snmp community "public" access-permissions rwa
-        /configure system management-interface configuration-mode mixed
-        /configure system management-interface cli cli-engine [classic-cli md-cli]
 
     md:
       kind: nokia_srsim

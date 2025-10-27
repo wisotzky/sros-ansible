@@ -5,11 +5,10 @@
 ---
 - hosts: clab-ansible-md
   gather_facts: No
+  connection: netconf     
 
   tasks:
   - name: get device info
-    vars:
-      ansible_connection: netconf     
     nokia.sros.device_info:
     register: device_info
 

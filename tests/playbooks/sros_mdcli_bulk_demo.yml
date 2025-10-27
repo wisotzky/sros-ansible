@@ -3,36 +3,27 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 ---
-- hosts: nokia
-  vars:
-    ansible_network_os: nokia.sros.md
-    ansible_user: admin
-    ansible_password: admin
-    ansible_command_timeout: 30
-  connection: network_cli
+- hosts: clab-ansible-md
   gather_facts: No
-
-  collections:
-  - nokia.sros
 
   tasks:
   - name: add services
-    cli_config:
+    ansible.netcommon.cli_config:
       config: "{{ lookup('ansible.builtin.template', '{{ playbook_dir }}/templates/addVplsBulk.cli.j2') }}"
 
 
   - name: admin save
-    cli_command:
+    ansible.netcommon.cli_command:
       command: admin save
     vars:
       ansible_command_timeout: 60
 
   - name: delete services
-    cli_config:
+    ansible.netcommon.cli_config:
       config: "{{ lookup('ansible.builtin.template', '{{ playbook_dir }}/templates/delVplsBulk.cli.j2') }}"
 
   - name: admin save
-    cli_command:
+    ansible.netcommon.cli_command:
       command: admin save
     vars:
       ansible_command_timeout: 60

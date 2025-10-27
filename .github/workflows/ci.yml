@@ -74,6 +74,23 @@ jobs:
       - name: Run Ansible Playbooks
         run: |
           cd tests
+
+          echo CLASSIC CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_classic_cli_commission.yml
+          ansible-playbook playbooks/sros_classic_cli_config_demo.yml --diff
+          ansible-playbook playbooks/sros_classic_cli_backup_restore_demo.yml
+          ansible-playbook playbooks/sros_classic_cli_command_demo.yml
+
+          echo MD-CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_mdcli_config_demo.yml --diff
+          ansible-playbook playbooks/sros_mdcli_backup_restore_demo.yml
+          ansible-playbook playbooks/sros_mdcli_bulk_demo.yml --diff
+          ansible-playbook playbooks/sros_mdcli_command_demo.yml
+
+          echo COMMON CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_cli_device_info.yml
+
+          echo NETCONF PLAYBOOKS
           ansible-playbook playbooks/sros_nc_device_info.yml
           ansible-playbook playbooks/sros_nc_state_demo.yml
           
