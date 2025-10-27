@@ -1,18 +1,10 @@
----
-- hosts: nokia
-  vars:
-    ansible_network_os: nokia.sros.md
-  vars_prompt:
-    - name: ansible_user
-      prompt: "Username"
-      private: no
-    - name: ansible_password
-      prompt: "Password"
-  connection: network_cli
-  gather_facts: No
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
 
-  collections:
-  - nokia.sros
+---
+- hosts: clab-ansible-md
+  gather_facts: No
 
   tasks:
   - name: do some config

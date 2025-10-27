@@ -1,6 +1,6 @@
 namespace: nokia
 name: sros
-version: 1.7.0
+version: 2.0.0
 readme: README.md
 authors:
 - Sven Wisotzky <sven.wisotzky@nokia.com>
@@ -21,4 +21,11 @@ dependencies:
 repository: https://github.com/nokia/sros-ansible
 documentation: https://github.com/nokia/sros-ansible
 homepage: https://github.com/nokia/sros-ansible
-issues: http://github.com/nokia/sros-ansible/issues
+issues: https://github.com/nokia/sros-ansible/issues
+
+build_ignore:
+  - .github/
+  - tools/
+  - tests/
+  - CHANGELOG.md
+  - CONTRIBUTING.md

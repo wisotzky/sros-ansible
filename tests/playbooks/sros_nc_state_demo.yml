@@ -1,22 +1,16 @@
+# Copyright 2025 Nokia
+# Licensed under the BSD 3-Clause License.
+# SPDX-License-Identifier: BSD-3-Clause
+
 ---
-- hosts: nokia
-  vars:
-    ansible_network_os: nokia.sros.md
-  vars_prompt:
-    - name: ansible_user
-      prompt: "Username"
-      private: no
-    - name: ansible_password
-      prompt: "Password"
-  connection: netconf
+- hosts: clab-ansible-md
   gather_facts: No
 
-  collections:
-  - nokia.sros
-
   tasks:
-  - name: get state
-    netconf_get:
+  - name: get state SR OS
+    vars:
+      ansible_connection: netconf     
+    ansible.netcommon.netconf_get:
       filter: <state xmlns="urn:nokia.com:sros:ns:yang:sr:state"><system/></state>
       display: json
     register: result
@@ -28,5 +22,4 @@
   - name: display results
     debug:
       var: my_var.output.data.state.system.version
-
 ...

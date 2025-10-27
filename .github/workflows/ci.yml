@@ -1,0 +1,100 @@
+---
+name: CICD
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    env:
+      SRSIM_LICENSE: ${{ secrets.SRSIM_LICENSE }}    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssh-dev
+
+      - name: Install requirements
+        run: pip install -r requirements.txt
+
+      - name: Install Ansible collections
+        run: |
+          ansible-galaxy collection install ansible.netcommon ansible.utils community.general
+
+      - name: Build and install this collection
+        run: |
+          ansible-galaxy collection install .
+
+      - name: Install containerlab
+        run: bash -c "$(curl -sL https://get.containerlab.dev)"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+#      - name: Pull Nokia SRSIM image
+#        run: |
+#          docker pull ghcr.io/nokia/srlinux:latest
+#          docker pull ghcr.io/nokia/nokia_srsim:25.7.R2
+
+      - name: Create license file
+        run: |
+          echo $SRSIM_LICENSE > tests/license.txt
+
+      - name: Start containerlab topology
+        run: |
+          sudo containerlab deploy --topo ./tests/topo.clab.yml
+
+      - name: Display ansible inventory
+        run: |
+          cat clab-ansible/ansible-inventory.yml
+
+      - name: Run Ansible Playbooks
+        run: |
+          cd tests
+
+          echo CLASSIC CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_classic_cli_commission.yml
+          ansible-playbook playbooks/sros_classic_cli_config_demo.yml --diff
+          ansible-playbook playbooks/sros_classic_cli_backup_restore_demo.yml
+          ansible-playbook playbooks/sros_classic_cli_command_demo.yml
+
+          echo MD-CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_mdcli_config_demo.yml --diff
+          ansible-playbook playbooks/sros_mdcli_backup_restore_demo.yml
+          ansible-playbook playbooks/sros_mdcli_bulk_demo.yml --diff
+          ansible-playbook playbooks/sros_mdcli_command_demo.yml
+
+          echo COMMON CLI PLAYBOOKS
+          ansible-playbook playbooks/sros_cli_device_info.yml
+
+          echo NETCONF PLAYBOOKS
+          ansible-playbook playbooks/sros_nc_device_info.yml
+          ansible-playbook playbooks/sros_nc_state_demo.yml
+          
+      - name: Destroy containerlab topology
+        if: always()
+        run: |
+          sudo containerlab destroy --topo ./tests/topo.clab.yml  
