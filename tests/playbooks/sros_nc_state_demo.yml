@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 ---
-- hosts: all
+- hosts: clab-ansible-md
   gather_facts: No
 
   tasks:
