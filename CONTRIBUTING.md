@@ -1,7 +1,7 @@
 # SR OS Ansible Collection – Developer & Contributor Guide
 
 Thank you for your interest in improving the **`nokia.sros`** Ansible collection!
-This guide explains how to set up your development environment, run tests, and contribute changes — following the [Ansible Community Guidelines](https://docs.ansible.com/ansible/latest/community/contributing.html).
+This guide explains how to set up your development environment, run tests, and contribute changes — following the [Ansible Community Guidelines](https://docs.ansible.com).
 
 ---
 
@@ -92,6 +92,9 @@ chmod +x run.sh
 ./run.sh destroy
 ```
 
+✅ **Tip:**
+This workflow is consistent across Linux, macOS, and BSD systems. Only the package-installation commands may vary (for example, use `brew install libssh` on macOS).
+
 ---
 
 ## Coding Standards
@@ -128,15 +131,7 @@ A pull request can be merged only when:
 
 ## Contributing
 
-We welcome all contributions — from small fixes to major enhancements.
-Whether you’re reporting a bug, improving documentation, or extending functionality, we’d love your input.
-
-| Type                          | Where to Start                                                                               |
-| ----------------------------- | -------------------------------------------------------------------------------------------- |
-| 🐞 **Report a bug**           | [Open an issue](https://github.com/nokia/sros-ansible/issues/new?template=bug_report.yml)    |
-| 💡 **Propose an enhancement** | [Start a discussion](https://github.com/nokia/sros-ansible/discussions/new?category=ideas)   |
-| 🧩 **Submit code or docs**    | [Create a pull request](https://github.com/nokia/sros-ansible/compare)                       |
-| 🧰 **Ask for guidance**       | [Join the Q&A discussions](https://github.com/nokia/sros-ansible/discussions/categories/q-a) |
+We welcome all contributions — from small fixes to major enhancements. Whether you’re reporting a bug, improving documentation, or extending functionality, we’d love your input.
 
 Before submitting a pull request:
 
@@ -151,22 +146,15 @@ Before submitting a pull request:
 
 If you encounter problems or need support:
 
-1. **Search existing threads**
-   Check [open issues](https://github.com/nokia/sros-ansible/issues) or [ongoing discussions](https://github.com/nokia/sros-ansible/discussions) to see if your topic is already covered.
+**Search existing threads**
+Check [open issues](https://github.com/nokia/sros-ansible/issues) to see if your topic is already covered.
 
-2. **Open a new issue**
-   Include:
+**Open a new issue**
 
-   * Your **OS**, **Python**, and **Ansible** versions
-   * The **SR OS** version used
-   * A concise problem description or error log
+Include the following information:
 
-3. **Discuss broader ideas**
-   Start a conversation under [Ideas & Proposals](https://github.com/nokia/sros-ansible/discussions/categories/ideas) for design suggestions or workflow questions.
+* Your **OS**, **Python**, and **Ansible** versions
+* The **SR OS** version used
+* A concise problem description or error log
 
 The maintainers and community collaborators monitor these channels and respond as time permits.
-
----
-
-✅ **Tip:**
-This workflow is consistent across Linux, macOS, and BSD systems. Only the package-installation commands may vary (for example, use `brew install libssh` on macOS).
