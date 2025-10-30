@@ -1,175 +1,172 @@
-# SR OS Ansible Collection Developer Guide
+# SR OS Ansible Collection – Developer & Contributor Guide
 
-Thank you for your interest in improving the `nokia.sros` Ansible collection! This guide captures the initial steps and key expectations for code changes, documentation updates, and release management.
+Thank you for your interest in improving the **`nokia.sros`** Ansible collection!
+This guide explains how to set up your development environment, run tests, and contribute changes — following the [Ansible Community Guidelines](https://docs.ansible.com/ansible/latest/community/contributing.html).
+
+---
+
+## Overview
+
+The `nokia.sros` collection provides network automation support for Nokia **SR OS** devices through **CLI** and **NETCONF** interfaces.
+Developers can use the included `run.sh` helper script to simplify local development, containerlab deployment, and regression testing.
+
+---
 
 ## Prerequisites
 
-* Python 3.9 or newer and `pip`
-* Docker for running the SR OS container images
-* Access to SR OS container images and licenses
+Before contributing, ensure your environment includes:
+
+* **Python 3.9 or newer**
+* **Ansible Core 2.13 or newer** (recommended)
+* **Docker** for running SR OS container images
+* **Access** to SR OS container images and a valid license file
+* A Linux, macOS, or BSD-like system with common GNU tools (`bash`, `curl`, `make`, etc.)
+
+---
 
 ## Quick Start
 
-Start with cloning the repo:
-
-```bash
-git clone git@github.com:nokia/sros-ansible.git
-cd sros-ansible
-```
-
-Deploy the lab to support the tests:
-
-```bash
-./run.sh deploy-lab
-```
-
-Run the automated suite of tests to make sure nothing is missing. This will also prepare a dev environment (you have to make sure the venv with ansible is activated or ansible-playbook is in your path):
-
-```bash
-./run.sh test
-```
-
-To validate that the code passes Ansible's sanity check, run:
-
-```bash
-./run.sh sanity-test
-```
-
-
-
-
-
-## Local development workflow
-
-1. Create a Python virtual environment and install dependencies:
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ./tools/run.sh deps
-   ```
-2. Run the static checks and unit validations:
-   ```bash
-   ./tools/run.sh sanity
-   ```
-3. Start an SR OS container and execute the integration tests. The helper script pulls the requested image, waits until the control plane is reachable, and executes `ansible-test` automatically:
-   ```bash
-   export SROS_CONTAINER_IMAGE=ghcr.io/nokia/sros-container:23.7.R1
-   export SROS_LICENSE_FILE=$HOME/.licenses/sros.lic
-    export SROS_CONTAINER_EXTRA_ARGS="--privileged"
-   export SROS_USERNAME=admin
-   export SROS_PASSWORD=admin
-   ./tools/run.sh integration --targets device_info
-   ```
-4. Build the distributable collection archive when you are ready to test the Galaxy packaging format:
-   ```bash
-   ./tools/run.sh build
-   ```
-
-### Repository secrets for CI
-
-CI integration tests require credentials for the private SR OS container registry and a base64-encoded license file. Configure the following repository secrets in GitHub before enabling the workflow:
-
-| Secret name | Purpose |
-|-------------|---------|
-| `SROS_REGISTRY` | Registry host, for example `ghcr.io`. |
-| `SROS_REGISTRY_USERNAME` | Account used to authenticate to the registry (typically your GitHub username). |
-| `SROS_REGISTRY_PASSWORD` | Personal access token with `read:packages` scope. |
-| `SROS_CONTAINER_LICENSE_B64` | Base64-encoded license contents produced with `base64 -w0 /path/to/sros.lic`. |
-| `SROS_USERNAME` *(optional)* | Overrides the device username used in integration tests (defaults to `admin`). |
-| `SROS_PASSWORD` *(optional)* | Overrides the device password used in integration tests (defaults to `admin`). |
-
-When running tests locally you can reuse the same credentials via environment variables (`SROS_REGISTRY`, `SROS_REGISTRY_USERNAME`, `SROS_REGISTRY_PASSWORD`, `SROS_LICENSE_FILE`) or log in with `docker login` ahead of time.
-
-## Coding standards
-
-* Follow the module and plugin layout used in the [Ansible community collections](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html).
-* Document new modules using the in-file `DOCUMENTATION`, `EXAMPLES`, and `RETURN` blocks.
-* Ensure your changes keep the Galaxy metadata (`galaxy.yml`) accurate.
-* Update both `CHANGELOG.md` and `README.md` whenever behaviour or dependencies change.
-
-## Commit & pull request expectations
-
-* Prefer small, focused commits that explain **what** and **why**.
-* Reference GitHub issues in commit messages or PR descriptions where applicable.
-* Every PR must pass the GitHub Actions CI pipeline before it can be merged.
-* Add or update tests when fixing bugs or introducing new features. At minimum, extend the integration test suite under `tests/integration/targets`.
-
-## Release process
-
-1. Update `galaxy.yml` with the new semantic version.
-2. Add a new entry to `CHANGELOG.md` describing the changes.
-3. Tag the release (for example `git tag v1.9.0`) and push the tag to GitHub.
-4. Creating a GitHub release automatically triggers the workflow that builds the collection and publishes it to Ansible Galaxy. Ensure the `ANSIBLE_GALAXY_API_KEY` secret is present in the repository settings.
-
-## Development
-
-### Running the automated checks locally
-
-The `tools/run.sh` helper mirrors the CI workflow and keeps prerequisites in one place:
+### 1. Set up a Python virtual environment
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ./tools/run.sh deps
-./tools/run.sh sanity
-./tools/run.sh build
 ```
 
-### Integration testing with containerised SR OS releases
-
-Integration tests rely on licensed SR OS container images. Provide the credentials and image that match your lab, then invoke the helper script:
+### 2. Clone the repository
 
 ```bash
-export SROS_CONTAINER_IMAGE=ghcr.io/nokia/sros-container:23.7.R1
-export SROS_LICENSE_FILE=$HOME/.licenses/sros.lic
-export SROS_USERNAME=admin
-export SROS_PASSWORD=admin
-./tools/run.sh integration --targets device_info
+git clone https://github.com/nokia/sros-ansible.git
+cd sros-ansible
 ```
 
-#### Authenticating to private registries and licensing the container
-
-The Nokia SR OS container hosted on GitHub Container Registry (GHCR) requires credentials and a valid license file.
-
-1. Generate a [personal access token](https://github.com/settings/tokens/new) from your GitHub account with the `read:packages` scope.
-2. Log in locally using Docker (replace `<username>` with your GitHub handle):
-   ```bash
-   echo '<token>' | docker login ghcr.io -u <username> --password-stdin
-   ```
-   Alternatively, export the following variables before running `tools/run.sh integration` so the helper can authenticate on your behalf:
-   ```bash
-   export SROS_REGISTRY=ghcr.io
-   export SROS_REGISTRY_USERNAME=<username>
-   export SROS_REGISTRY_PASSWORD='<token>'
-   ```
-3. Obtain a SR OS container license file from Nokia support and set `SROS_LICENSE_FILE` to its absolute path.
-
-For GitHub Actions, store the same information as repository secrets so CI can authenticate and mount the license:
-
-| Secret name | Purpose |
-|-------------|---------|
-| `SROS_REGISTRY` | Registry host, for example `ghcr.io`. |
-| `SROS_REGISTRY_USERNAME` | Username used to authenticate to the registry. |
-| `SROS_REGISTRY_PASSWORD` | Personal access token with `read:packages`. |
-| `SROS_CONTAINER_LICENSE_B64` | Base64-encoded license contents: `base64 -w0 /path/to/sros.lic`. |
-| `SROS_USERNAME` *(optional)* | Device username injected into the integration tests (defaults to `admin`). |
-| `SROS_PASSWORD` *(optional)* | Device password injected into the integration tests (defaults to `admin`). |
-
-The script downloads the image (performing `docker login` if already configured), exposes SSH on `localhost:2222` and NETCONF on `localhost:2830`, waits for the control plane to boot, and executes `ansible-test integration` against the inventory in `tests/integration`.
-Set `SROS_CONTAINER_EXTRA_ARGS="--privileged"` if your SR OS image requires elevated container permissions.
-
-### Releasing
-
-Tagged releases on GitHub automatically build the collection artifact and publish it to Ansible Galaxy by using the
-`ANSIBLE_GALAXY_API_KEY` secret. To perform a dry run locally you can execute:
+### 3. Install dependencies
 
 ```bash
-./tools/run.sh build
-ansible-galaxy collection publish dist/nokia-sros-*.tar.gz --api-key <token>
+python -m pip install --upgrade pip
+
+sudo apt-get update
+sudo apt-get install -y libssh-dev
+
+pip install -r requirements.txt
+
+ansible-galaxy collection install ansible.netcommon
+ansible-galaxy collection install ansible.utils
+ansible-galaxy collection install community.general
 ```
 
-Refer to the [CONTRIBUTING](CONTRIBUTING.md) guide for full details on coding conventions, testing expectations, and the release checklist.
+Install [containerlab](https://containerlab.dev):
 
-## Need help?
+```bash
+bash -c "$(curl -sL https://get.containerlab.dev)"
+```
 
-Open a discussion or issue in the repository and describe the environment, SR OS version, and exact failure symptoms. The maintainers and community collaborators monitor the queue and will respond as time permits.
+### 4. Prepare images and licenses
+
+Pull `nokia_sros` container image(s) and ensure a valid SR OS license file is available.
+
+### 5. Build and install the collection locally
+
+```bash
+ansible-galaxy collection install .
+```
+
+### 6. Deploy and test the example lab
+
+```bash
+cd tests
+chmod +x run.sh
+./run.sh deploy
+```
+
+### 7. Run all regression tests
+
+```bash
+./run.sh run --category all --quiet --all
+```
+
+### 8. Clean up when finished
+
+```bash
+./run.sh destroy
+```
+
+---
+
+## Coding Standards
+
+Follow Ansible and Python best practices:
+
+* Use the standard [Ansible module structure](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html)
+* Include `DOCUMENTATION`, `EXAMPLES`, and `RETURN` blocks in every module
+* Keep `galaxy.yml` metadata accurate and up to date
+* Update `CHANGELOG.md` and `README.md` for user-visible changes
+* Validate your work with:
+
+  * `./run.sh sanity` or `./run.sh test`
+  * Linting and style checks
+  * Unit and integration test suites
+
+---
+
+## Commit & Pull Request Guidelines
+
+* Write **clear, focused commits** that explain both *what* and *why*
+* Reference related issues (e.g. `Fixes #42`)
+* Ensure all tests pass before requesting review
+* Add or update tests for new features or bug fixes
+* Maintain consistent docstrings, examples, and return schemas
+
+A pull request can be merged only when:
+
+* All CI checks pass successfully
+* A maintainer approves the change
+* The update fits the project’s goals and quality standards
+
+---
+
+## Contributing
+
+We welcome all contributions — from small fixes to major enhancements.
+Whether you’re reporting a bug, improving documentation, or extending functionality, we’d love your input.
+
+| Type                          | Where to Start                                                                               |
+| ----------------------------- | -------------------------------------------------------------------------------------------- |
+| 🐞 **Report a bug**           | [Open an issue](https://github.com/nokia/sros-ansible/issues/new?template=bug_report.yml)    |
+| 💡 **Propose an enhancement** | [Start a discussion](https://github.com/nokia/sros-ansible/discussions/new?category=ideas)   |
+| 🧩 **Submit code or docs**    | [Create a pull request](https://github.com/nokia/sros-ansible/compare)                       |
+| 🧰 **Ask for guidance**       | [Join the Q&A discussions](https://github.com/nokia/sros-ansible/discussions/categories/q-a) |
+
+Before submitting a pull request:
+
+* Run all tests (`./run.sh sanity` or `./run.sh test`)
+* Follow [PEP 8](https://peps.python.org/pep-0008/) and Ansible plugin guidelines
+* Ensure changes are documented and clearly commented
+* Update or add integration tests where relevant
+
+---
+
+## Getting Help
+
+If you encounter problems or need support:
+
+1. **Search existing threads**
+   Check [open issues](https://github.com/nokia/sros-ansible/issues) or [ongoing discussions](https://github.com/nokia/sros-ansible/discussions) to see if your topic is already covered.
+
+2. **Open a new issue**
+   Include:
+
+   * Your **OS**, **Python**, and **Ansible** versions
+   * The **SR OS** version used
+   * A concise problem description or error log
+
+3. **Discuss broader ideas**
+   Start a conversation under [Ideas & Proposals](https://github.com/nokia/sros-ansible/discussions/categories/ideas) for design suggestions or workflow questions.
+
+The maintainers and community collaborators monitor these channels and respond as time permits.
+
+---
+
+✅ **Tip:**
+This workflow is consistent across Linux, macOS, and BSD systems. Only the package-installation commands may vary (for example, use `brew install libssh` on macOS).
