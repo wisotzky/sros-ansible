@@ -1,6 +1,10 @@
 dist/
 .venv/
+.ansible_collections/
 __pycache__/
 *.tar.gz
-.ansible_collections/
-.licenses/
+tests/clab-*
+.vscode/
+*.log
+license.*
+.DS_Store
