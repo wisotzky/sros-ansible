@@ -17,7 +17,7 @@ Developers can use the included `run.sh` helper script to simplify local develop
 Before contributing, ensure your environment includes:
 
 * **Python 3.9 or newer**
-* **Ansible Core 2.13 or newer** (recommended)
+* **Ansible Core 2.14 or newer** (recommended)
 * **Docker** for running SR OS container images
 * **Access** to SR OS container images and a valid license file
 * A Linux, macOS, or BSD-like system with common GNU tools (`bash`, `curl`, `make`, etc.)
@@ -26,19 +26,18 @@ Before contributing, ensure your environment includes:
 
 ## Quick Start
 
-### 1. Set up a Python virtual environment
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/nokia/sros-ansible.git
+cd sros-ansible-collection
+```
+
+### 2. Set up a Python virtual environment
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-./tools/run.sh deps
-```
-
-### 2. Clone the repository
-
-```bash
-git clone https://github.com/nokia/sros-ansible.git
-cd sros-ansible
 ```
 
 ### 3. Install dependencies
@@ -49,11 +48,9 @@ python -m pip install --upgrade pip
 sudo apt-get update
 sudo apt-get install -y libssh-dev
 
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
-ansible-galaxy collection install ansible.netcommon
-ansible-galaxy collection install ansible.utils
-ansible-galaxy collection install community.general
+ansible-galaxy collection install ansible.netcommon ansible.utils community.general
 ```
 
 Install [containerlab](https://containerlab.dev):
